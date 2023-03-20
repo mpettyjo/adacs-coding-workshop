@@ -4,7 +4,7 @@ This program simulates the distribution of foreground stars toward the Andromeda
 
 # import python packages for use in this program
 import math # pi, cos
-import random # uniform 
+import random # uniform
 
 # Determine Andromeda location in ra/dec degrees
 # from wikipedia
@@ -30,7 +30,7 @@ for i in range(NSRC):
 
 
 # now write these to a csv file for use by my other program
-f = open('catalog.csv', 'w')
+f = open('/Users/mpettyjo/Documents/ADACS Workshop/data/processed/catalog.csv', 'w')
 print("id,ra,dec", file=f)
 for i in range(NSRC):
     print("{0:07d}, {1:12f}, {2:12f}".format(i, RAs[i], DECs[i]), file=f)
