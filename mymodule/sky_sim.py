@@ -14,7 +14,7 @@ NUM_STARS = 1_000_000
 
 def get_radec():
     ''' Determine Andromeda location in ra/dec degrees '''
-    # from wikipedia 
+    # from wikipedia
     RA = '00:42:44.3'
     DEC = '41:16:09'
 
@@ -37,17 +37,18 @@ def make_stars(ra, dec, NUM_STARS):
     return (ras, decs)
 
 def main():
+    ''' run get_radec and make_stars functions and save the ra/dec of 
+    the stars to a catalog csv file '''
     ra, dec = get_radec()
     ras, decs = make_stars(ra, dec, NUM_STARS)
 
     # now write these to a csv file for use by my other program
-    f = open('/Users/mpettyjo/Documents/ADACS Workshop/data/processed/catalog.csv',
-            'w', encoding='utf-8')
+    f = open('/Users/mpettyjo/Documents/ADACS Workshop/data/processed/catalog.csv', 'w', 
+             encoding='utf-8')
     print("id,ra,dec", file=f)
     for i in range(NUM_STARS):
         print(f"{i:07d}, {ras[i]:12f}, {decs[i]:12f}", file=f)
     f.close()
-    return
 
 if __name__ == '__main__':
     main()
