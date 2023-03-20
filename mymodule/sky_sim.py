@@ -13,21 +13,40 @@ import random # uniform
 NUM_STARS = 1_000_000
 
 def get_radec():
-    ''' Determine Andromeda location in ra/dec degrees '''
+    ''' Determine Andromeda location in ra/dec degrees.
+
+    Function that computes the location of Andromeda in 
+    right ascension, `ra` and declination, `dec`, both in degrees.
+    Both `ra` and `dec` are converted from HMS and DMS forms.
+    
+    Parameters
+    ----------
+    RA : string
+    DEC : string
+    D, M, S : floats
+    H, M, S : floats
+
+    Returns
+    -------
+    Tuple
+        Explanation of anonymous return value of type ``tuple``.
+    (ra, dec) : tuple
+        Tuple of the right ascension and declination in degrees.
+    '''
     # from wikipedia
     RA = '00:42:44.3'
     DEC = '41:16:09'
 
     # convert to decimal degrees
-    D, M, S = DEC.split(':')
+    D, M, S = DEC.split(':') # degrees, minutes, seconds
     dec = int(D)+int(M)/60+float(S)/3600
 
-    H, M, S = RA.split(':')
+    H, M, S = RA.split(':') # hours, minutes, seconds
     ra = 15*(int(H)+int(M)/60+float(S)/3600)
     ra = ra/math.cos(dec*math.pi/180)
     return (ra, dec)
 
-def make_stars(ra, dec, NUM_STARS):
+def make_stars(ra:float, dec:float, NUM_STARS:int) -> Tuple(List(float),List(float)):
     ''' make 1000 stars within 1 degree of Andromeda '''
     ras = []
     decs = []
