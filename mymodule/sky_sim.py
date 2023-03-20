@@ -9,14 +9,14 @@ import random # uniform
 
 # Determine Andromeda location in ra/dec degrees
 # from wikipedia
-ra = '00:42:44.3'
-dec = '41:16:09'
+RA = '00:42:44.3'
+DEC = '41:16:09'
 
 # convert to decimal degrees
-D, M, S = dec.split(':')
+D, M, S = DEC.split(':')
 dec = int(D)+int(M)/60+float(S)/3600
 
-H, M, S = ra.split(':')
+H, M, S = RA.split(':')
 ra = 15*(int(H)+int(M)/60+float(S)/3600)
 ra = ra/math.cos(dec*math.pi/180)
 
@@ -31,7 +31,7 @@ for i in range(NSRC):
 
 
 # now write these to a csv file for use by my other program
-f = open('/Users/mpettyjo/Documents/ADACS Workshop/data/processed/catalog.csv', 'w')
+f = open('/Users/mpettyjo/Documents/ADACS Workshop/data/processed/catalog.csv', 'w', encoding='utf-8')
 print("id,ra,dec", file=f)
 for i in range(NSRC):
     print("{0:07d}, {1:12f}, {2:12f}".format(i, ras[i], decs[i]), file=f)
