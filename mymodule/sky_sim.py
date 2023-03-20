@@ -20,20 +20,20 @@ H, M, S = RA.split(':')
 ra = 15*(int(H)+int(M)/60+float(S)/3600)
 ra = ra/math.cos(dec*math.pi/180)
 
-NSRC = 1_000_000
+NUM_STARS = 1_000_000
 
 # make 1000 stars within 1 degree of Andromeda
 ras = []
 decs = []
-for i in range(NSRC):
+for i in range(NUM_STARS):
     ras.append(ra + random.uniform(-1, 1))
     decs.append(dec + random.uniform(-1, 1))
 
 
 # now write these to a csv file for use by my other program
-f = open('/Users/mpettyjo/Documents/ADACS Workshop/data/processed/catalog.csv', 'w', encoding='utf-8')
+f = open('/Users/mpettyjo/Documents/ADACS Workshop/data/processed/catalog.csv',
+         'w', encoding='utf-8')
 print("id,ra,dec", file=f)
-for i in range(NSRC):
-    print("{0:07d}, {1:12f}, {2:12f}".format(i, ras[i], decs[i]), file=f)
+for i in range(NUM_STARS):
+    print(f"{i:07d}, {ras[i]:12f}, {decs[i]:12f}", file=f)
 f.close()
-
