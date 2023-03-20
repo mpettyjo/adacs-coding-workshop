@@ -47,7 +47,29 @@ def get_radec():
     return (ra, dec)
 
 def make_stars(ra:float, dec:float, NUM_STARS:int) -> Tuple(List(float),List(float)):
-    ''' make 1000 stars within 1 degree of Andromeda '''
+    ''' Make 1000 stars within 1 degree of Andromeda's position on the sky.
+    
+        Function that computes the location of `NUM_STARS` around 1 degree of 
+        Andromeda's position on the sky in right ascension `ra` and 
+        declination `dec`.
+        
+        Parameters
+        ----------
+        ra: float
+            Right ascension of Andromeda's position on the sky in degrees.
+        dec: float
+            Declination of Andromeda's position on the sky in degrees.
+        NUM_STARS: int
+            Number of stars to compute the location of within 1 degree of
+            Andromeda's position.
+
+        Returns
+        -------
+        Tuple
+            Explanation of anonymous return value of type ``tuple``.
+        (ras, decs) : tuple
+            Tuple of the right ascension and declination in degrees.
+        '''
     ras = []
     decs = []
     for i in range(NUM_STARS):
