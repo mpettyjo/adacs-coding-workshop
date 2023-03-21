@@ -67,8 +67,13 @@ def make_stars(ra:float, dec:float, NUM_STARS:int) -> Tuple(List(float),List(flo
     return (ras, decs)
 
 def main():
-    ''' run get_radec and make_stars functions and save the ra/dec of 
-    the stars to a catalog csv file '''
+    ''' Make and save right ascension and declination catalog of stars to csv.
+
+    Function that runs the get_radec and make_stars functions and 
+    saves the right ascension and declination of the stars to a catalog 
+    csv file named catalog.csv. 
+    
+    '''
     ra, dec = get_radec()
     ras, decs = make_stars(ra, dec, NUM_STARS)
 
