@@ -114,7 +114,7 @@ if __name__ == '__main__':
         dec = options.dec
     
     ras, decs = make_stars(ra, dec, NUM_STARS)
-    
+
     # now write these to a csv file for use by my other program
     with open(options.out,'w') as f:
         print("id,ra,dec", file=f)
