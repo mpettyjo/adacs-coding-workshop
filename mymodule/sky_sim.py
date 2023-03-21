@@ -12,7 +12,7 @@ import random # uniform
 # global variables
 NUM_STARS = 1_000_000
 
-def get_radec():
+def get_radec() -> Tuple(float,float):
     ''' Determine Andromeda location in ra/dec degrees.
 
     Function that computes the location of Andromeda in 
@@ -72,7 +72,6 @@ def main():
     Function that runs the get_radec and make_stars functions and 
     saves the right ascension and declination of the stars to a catalog 
     csv file named catalog.csv. 
-    
     '''
     ra, dec = get_radec()
     ras, decs = make_stars(ra, dec, NUM_STARS)
