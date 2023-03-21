@@ -8,11 +8,12 @@ toward the Andromeda Galaxy in ra/dec.
 # import python packages for use in this program
 import math # pi, cos
 import random # uniform
+import argparse
 
 # global variables
 NUM_STARS = 1_000_000
 
-def get_radec() -> Tuple(float,float):
+def get_radec():
     ''' Determine Andromeda location in ra/dec degrees.
 
     Function that computes the location of Andromeda in 
@@ -37,7 +38,7 @@ def get_radec() -> Tuple(float,float):
     ra = ra/math.cos(dec*math.pi/180)
     return (ra, dec)
 
-def make_stars(ra:float, dec:float, NUM_STARS:int) -> Tuple(List(float),List(float)):
+def make_stars(ra:float, dec:float, NUM_STARS:int):
     ''' Make 1000 stars within 1 degree of Andromeda's position on the sky.
     
         Function that computes the location of `NUM_STARS` around 1 degree of 
@@ -84,7 +85,40 @@ def main():
         print(f"{i:07d}, {ras[i]:12f}, {decs[i]:12f}", file=f)
     f.close()
 
-if __name__ == '__main__':
-    main()
+def skysim_parser():
+    """
+    Configure the argparse for skysim
 
-# testing
+    Returns
+    -------
+    parser : argparse.ArgumentParser
+        The parser for skysim.
+    """
+    parser = argparse.ArgumentParser(prog='sky_sim', prefix_chars='-')
+    parser.add_argument('--ra', dest = 'ra', type=float, default=None,
+                        help="Central ra (degrees) for the simulation location")
+    parser.add_argument('--dec', dest = 'dec', type=float, default=None,
+                        help="Central dec (degrees) for the simulation location")
+    parser.add_argument('--out', dest='out', type=str, default='catalog.csv',
+                        help='destination for the output catalog')
+    return parser
+
+if __name__ == '__main__':
+    parser = skysim_parser()
+    options = parser.parse_args()
+    # if ra/dec are not supplied the use a default value
+    if None in [options.ra, options.dec]:
+        ra, dec = get_radec()
+    else:
+        ra = options.ra
+        dec = options.dec
+    
+    ras, decs = make_stars(ra, dec, NUM_STARS)
+    
+    # now write these to a csv file for use by my other program
+    with open(options.out,'w') as f:
+        print("id,ra,dec", file=f)
+        for i in range(NUM_STARS):
+            print(f"{i:07d}, {ras[i]:12f}, {decs[i]:12f}", file=f)
+    f.close()
+    print(f"Wrote {options.out}")
