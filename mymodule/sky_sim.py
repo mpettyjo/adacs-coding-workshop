@@ -18,19 +18,10 @@ def get_radec():
     Function that computes the location of Andromeda in 
     right ascension, `ra` and declination, `dec`, both in degrees.
     Both `ra` and `dec` are converted from HMS and DMS forms.
-    
-    Parameters
-    ----------
-    RA : string
-    DEC : string
-    D, M, S : floats
-    H, M, S : floats
 
     Returns
     -------
-    Tuple
-        Explanation of anonymous return value of type ``tuple``.
-    (ra, dec) : tuple
+    (ra, dec) : (float, float)
         Tuple of the right ascension and declination in degrees.
     '''
     # from wikipedia
@@ -65,9 +56,7 @@ def make_stars(ra:float, dec:float, NUM_STARS:int) -> Tuple(List(float),List(flo
 
         Returns
         -------
-        Tuple
-            Explanation of anonymous return value of type ``tuple``.
-        (ras, decs) : tuple
+        (ras, decs) : (list(float), list(float))
             Tuple of the right ascension and declination in degrees.
         '''
     ras = []
