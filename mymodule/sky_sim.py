@@ -77,7 +77,7 @@ def main():
     ras, decs = make_stars(ra, dec, NUM_STARS)
 
     # now write these to a csv file for use by my other program
-    f = open('/Users/mpettyjo/Documents/ADACS Workshop/data/processed/catalog.csv', 'w', 
+    f = open('/Users/mpettyjo/Documents/ADACS Workshop/mymodule/catalog.csv', 'w', 
              encoding='utf-8')
     print("id,ra,dec", file=f)
     for i in range(NUM_STARS):
