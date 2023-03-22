@@ -69,7 +69,7 @@ def make_stars_parallel(ra, dec, nsrc=NSRC, cores=None):
         pool.close()
         pool.join()
 
-        # crete an empty array to hold our results
+        # create an empty array to hold our results
         radec = np.empty((2,nsrc),dtype=np.float64)
 
         # iterate over the results (a list of whatever was returned from make_stars)
