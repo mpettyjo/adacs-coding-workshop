@@ -62,11 +62,12 @@ def make_stars(ra:float, dec:float, NUM_STARS:int):
         (ras, decs) : (list(float), list(float))
             Tuple of the right ascension and declination in degrees.
         '''
-    ras = []
-    decs = []
-    for i in range(NUM_STARS):
-        ras.append(ra + random.uniform(-1, 1))
-        decs.append(dec + random.uniform(-1, 1))
+    
+    ras = np.random.uniform(ra-1, ra+1, NUM_STARS)
+    decs = np.random.uniform(dec-1, dec+1, NUM_STARS)
+    # for i in range(NUM_STARS):
+    #     ras.append(ra + random.uniform(-1, 1))
+    #     decs.append(dec + random.uniform(-1, 1))
     return (np.array(ras), np.array(decs))
 
 def main():
@@ -80,12 +81,13 @@ def main():
     ras, decs = make_stars(ra, dec, NUM_STARS)
 
     # now write these to a csv file for use by my other program
-    data = []
-    for i in range(NUM_STARS):
-        data.append([int(i),np.round(ras[i],12),np.round(decs[i],12)])
-    df = pd.DataFrame(data, columns=['id','ra','dec'])
-
-    df.to_csv('/Users/mpettyjo/Documents/ADACS Workshop/mymodule/catalog.csv') 
+    with open(options.out,'w') as f:
+        print("id,ra,dec", file=f)
+        for i in range(NUM_STARS):
+            print(f"{i:07d}, {ras[i]:12f}, {decs[i]:12f}", file=f)
+    print(f"Wrote {options.out}")
+    f.close()
+    
 
 def skysim_parser():
     """
@@ -118,10 +120,9 @@ if __name__ == '__main__':
     ras, decs = make_stars(ra, dec, NUM_STARS)
 
     # now write these to a csv file for use by my other program
-    data = []
-    for i in range(NUM_STARS):
-        data.append([int(i),np.round(ras[i],12),np.round(decs[i],12)])
-    df = pd.DataFrame(data, columns=['id','ra','dec'])
-    df.to_csv('/Users/mpettyjo/Documents/ADACS Workshop/mymodule/catalog.csv') 
-
+    with open(options.out,'w') as f:
+        print("id,ra,dec", file=f)
+        for i in range(NUM_STARS):
+            print(f"{i:07d}, {ras[i]:12f}, {decs[i]:12f}", file=f)
     print(f"Wrote {options.out}")
+    f.close()
