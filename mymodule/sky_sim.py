@@ -1,124 +1,91 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
+# Demonstrate that we can simulate a catalogue of stars on the sky
 
-'''
-This program simulates the distribution of foreground stars
-toward the Andromeda Galaxy in ra/dec.
-'''
+# Determine Andromeda location in ra/dec degrees
+import math
+import numpy as np
+import multiprocessing
+import sys
 
-# import python packages for use in this program
-import math # pi, cos
-import random # uniform
-import argparse
+NSRC = 1_000_000
 
-# global variables
-NUM_STARS = 1_000_000
 
 def get_radec():
-    ''' Determine Andromeda location in ra/dec degrees.
-
-    Function that computes the location of Andromeda in 
-    right ascension, `ra` and declination, `dec`, both in degrees.
-    Both `ra` and `dec` are converted from HMS and DMS forms.
-
-    Returns
-    -------
-    (ra, dec) : (float, float)
-        Tuple of the right ascension and declination in degrees.
-    '''
     # from wikipedia
-    RA = '00:42:44.3'
-    DEC = '41:16:09'
+    ra = '00:42:44.3'
+    dec = '41:16:09'
 
-    # convert to decimal degrees
-    D, M, S = DEC.split(':') # degrees, minutes, seconds
-    dec = int(D)+int(M)/60+float(S)/3600
+    d, m, s = dec.split(':')
+    dec = int(d)+int(m)/60+float(s)/3600
 
-    H, M, S = RA.split(':') # hours, minutes, seconds
-    ra = 15*(int(H)+int(M)/60+float(S)/3600)
+    h, m, s = ra.split(':')
+    ra = 15*(int(h)+int(m)/60+float(s)/3600)
     ra = ra/math.cos(dec*math.pi/180)
-    return (ra, dec)
+    return ra,dec
 
-def make_stars(ra:float, dec:float, NUM_STARS:int):
-    ''' Make 1000 stars within 1 degree of Andromeda's position on the sky.
+
+def make_stars(args):
+    """
+    """
+    #unpack the arguments
+    ra, dec, nsrc = args
+    # create an empy array for our results
+    radec = np.empty((2,nsrc))
+
+    # make nsrc stars within 1 degree of ra/dec
+    radec[0,:] = np.random.uniform(ra-1, ra+1, size=nsrc)
+    radec[1,:] = np.random.uniform(dec-1, dec+1, size=nsrc)
     
-        Function that computes the location of `NUM_STARS` around 1 degree of 
-        Andromeda's position on the sky in right ascension `ra` and 
-        declination `dec`.
-        
-        Parameters
-        ----------
-        ra: float
-            Right ascension of Andromeda's position on the sky in degrees.
-        dec: float
-            Declination of Andromeda's position on the sky in degrees.
-        NUM_STARS: int
-            Number of stars to compute the location of within 1 degree of
-            Andromeda's position.
+    # return our results
+    return radec
 
-        Returns
-        -------
-        (ras, decs) : (list(float), list(float))
-            Tuple of the right ascension and declination in degrees.
-        '''
-    ras = []
-    decs = []
-    for i in range(NUM_STARS):
-        ras.append(ra + random.uniform(-1, 1))
-        decs.append(dec + random.uniform(-1, 1))
-    return (ras, decs)
+def make_stars_parallel(ra, dec, nsrc=NSRC, cores=None):
+    
+    # By default use all available cores
+    if cores is None:
+        cores = multiprocessing.cpu_count()
+    
 
-def main():
-    ''' Make and save right ascension and declination catalog of stars to csv.
+    # 20 jobs each doing 1/20th of the sources
+    group_size = nsrc//20
+    args = [(ra, dec, group_size) for _ in range(20)]
 
-    Function that runs the get_radec and make_stars functions and 
-    saves the right ascension and declination of the stars to a catalog 
-    csv file named catalog.csv. 
-    '''
-    ra, dec = get_radec()
-    ras, decs = make_stars(ra, dec, NUM_STARS)
 
-    # now write these to a csv file for use by my other program
-    f = open('/Users/mpettyjo/Documents/ADACS Workshop/mymodule/catalog.csv', 'w', 
-             encoding='utf-8')
-    print("id,ra,dec", file=f)
-    for i in range(NUM_STARS):
-        print(f"{i:07d}, {ras[i]:12f}, {decs[i]:12f}", file=f)
-    f.close()
+    # start a new process for each task, hopefully to reduce residual
+    # memory use
+    ctx = multiprocessing.get_context()
+    pool = ctx.Pool(processes=cores, maxtasksperchild=1)
 
-def skysim_parser():
-    """
-    Configure the argparse for skysim
-
-    Returns
-    -------
-    parser : argparse.ArgumentParser
-        The parser for skysim.
-    """
-    parser = argparse.ArgumentParser(prog='sky_sim', prefix_chars='-')
-    parser.add_argument('--ra', dest = 'ra', type=float, default=None,
-                        help="Central ra (degrees) for the simulation location")
-    parser.add_argument('--dec', dest = 'dec', type=float, default=None,
-                        help="Central dec (degrees) for the simulation location")
-    parser.add_argument('--out', dest='out', type=str, default='catalog.csv',
-                        help='destination for the output catalog')
-    return parser
-
-if __name__ == '__main__':
-    parser = skysim_parser()
-    options = parser.parse_args()
-    # if ra/dec are not supplied the use a default value
-    if None in [options.ra, options.dec]:
-        ra, dec = get_radec()
+    try:
+        # call make_posisions(a) for each a in args
+        results = pool.map(make_stars, args, chunksize=1)
+    except KeyboardInterrupt:
+        # stop all the processes if the user calls the kbd interrupt
+        print("Caught kbd interrupt")
+        pool.close()
+        sys.exit(1)
     else:
-        ra = options.ra
-        dec = options.dec
-    
-    ras, decs = make_stars(ra, dec, NUM_STARS)
+        # join the pool means wait until there are results
+        pool.close()
+        pool.join()
 
+        # crete an empty array to hold our results
+        radec = np.empty((2,nsrc),dtype=np.float64)
+
+        # iterate over the results (a list of whatever was returned from make_stars)
+        for i,r in enumerate(results):
+            # store the returned results in the right place in our array
+            start = i*group_size
+            end = start + group_size
+            radec[:,start:end] = r
+            
+    return radec
+
+if __name__ == "__main__":
+    ra,dec = get_radec()
+    pos = make_stars_parallel(ra, dec, NSRC, 2)
     # now write these to a csv file for use by my other program
-    with open(options.out,'w') as f:
+    with open('catalog.csv', 'w') as f:
         print("id,ra,dec", file=f)
-        for i in range(NUM_STARS):
-            print(f"{i:07d}, {ras[i]:12f}, {decs[i]:12f}", file=f)
-    f.close()
-    print(f"Wrote {options.out}")
+        np.savetxt(f, np.column_stack((np.arange(NSRC), pos[0,:].T, pos[1,:].T)),fmt='%07d, %12f, > %12f')
+
