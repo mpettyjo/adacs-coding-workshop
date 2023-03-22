@@ -9,6 +9,8 @@ toward the Andromeda Galaxy in ra/dec.
 import math # pi, cos
 import random # uniform
 import argparse
+import pandas as pd
+import numpy as np
 
 # global variables
 NUM_STARS = 1_000_000
@@ -65,7 +67,7 @@ def make_stars(ra:float, dec:float, NUM_STARS:int):
     for i in range(NUM_STARS):
         ras.append(ra + random.uniform(-1, 1))
         decs.append(dec + random.uniform(-1, 1))
-    return (ras, decs)
+    return (np.array(ras), np.array(decs))
 
 def main():
     ''' Make and save right ascension and declination catalog of stars to csv.
@@ -78,12 +80,12 @@ def main():
     ras, decs = make_stars(ra, dec, NUM_STARS)
 
     # now write these to a csv file for use by my other program
-    f = open('/Users/mpettyjo/Documents/ADACS Workshop/mymodule/catalog.csv', 'w', 
-             encoding='utf-8')
-    print("id,ra,dec", file=f)
+    data = []
     for i in range(NUM_STARS):
-        print(f"{i:07d}, {ras[i]:12f}, {decs[i]:12f}", file=f)
-    f.close()
+        data.append([int(i),np.round(ras[i],12),np.round(decs[i],12)])
+    df = pd.DataFrame(data, columns=['id','ra','dec'])
+
+    df.to_csv('/Users/mpettyjo/Documents/ADACS Workshop/mymodule/catalog.csv') 
 
 def skysim_parser():
     """
@@ -116,9 +118,10 @@ if __name__ == '__main__':
     ras, decs = make_stars(ra, dec, NUM_STARS)
 
     # now write these to a csv file for use by my other program
-    with open(options.out,'w') as f:
-        print("id,ra,dec", file=f)
-        for i in range(NUM_STARS):
-            print(f"{i:07d}, {ras[i]:12f}, {decs[i]:12f}", file=f)
-    f.close()
+    data = []
+    for i in range(NUM_STARS):
+        data.append([int(i),np.round(ras[i],12),np.round(decs[i],12)])
+    df = pd.DataFrame(data, columns=['id','ra','dec'])
+    df.to_csv('/Users/mpettyjo/Documents/ADACS Workshop/mymodule/catalog.csv') 
+
     print(f"Wrote {options.out}")
